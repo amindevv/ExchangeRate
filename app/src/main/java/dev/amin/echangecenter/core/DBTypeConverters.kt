@@ -3,7 +3,6 @@ package dev.amin.echangecenter.core
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import dev.amin.echangecenter.data.RequestStatus
 import java.util.*
 
 class DBTypeConverters {

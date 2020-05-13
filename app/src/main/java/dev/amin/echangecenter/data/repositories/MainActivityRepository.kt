@@ -1,21 +1,28 @@
 package dev.amin.echangecenter.data.repositories
 
+import android.content.Context
 import android.util.Log
+import dev.amin.echangecenter.core.AppDb
 import dev.amin.echangecenter.core.RetrofitClient
 import dev.amin.echangecenter.data.RequestStatus
-import dev.amin.echangecenter.data.models.RatesResponse
+import dev.amin.echangecenter.data.models.Rates
 import kotlinx.coroutines.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.*
 
-class MainActivityRepository {
+class MainActivityRepository(context: Context) {
 
     var baseCurrency = "EUR"
 
     private var shouldReceiveUpdates = false
 
+    /* Request Status is used for handling if the repo should
+        make the next request or not */
     private var requestStatus = RequestStatus.NONE
+
+    private val db = AppDb.invoke(context)
 
     private fun getExchangesRates() = runBlocking(Dispatchers.Default) {
 
@@ -23,31 +30,45 @@ class MainActivityRepository {
 
         val call = RetrofitClient.exchangeInterface.getLatest(baseCurrency)
 
-        call.enqueue(object : Callback<RatesResponse> {
+        call.enqueue(object : Callback<Rates> {
 
-            override fun onFailure(call: Call<RatesResponse>, t: Throwable) {
+            override fun onFailure(call: Call<Rates>, t: Throwable) {
 
                 requestStatus = RequestStatus.FAILURE
             }
 
             override fun onResponse(
-                call: Call<RatesResponse>,
-                response: Response<RatesResponse>
+                call: Call<Rates>,
+                response: Response<Rates>
             ) {
 
-                if (response.body() != null) {
+                val ratesResponse = response.body()
+
+                if (ratesResponse != null) {
 
                     requestStatus = RequestStatus.SUCCESS
+
+                    saveRates(ratesResponse)
                 } else {
 
                     requestStatus = RequestStatus.FAILURE
                 }
 
-                // Todo: Here save the response!
-
                 // Todo: remember to put something that checks the base while ui rendering, validation
             }
         })
+    }
+
+    /* Just simply saves the Rates in db */
+    private fun saveRates(rates: Rates) = runBlocking(Dispatchers.IO) {
+
+        val dao = db.ratesDao()
+
+        rates.apply {
+            dateCreated = Date(System.currentTimeMillis())
+        }
+
+        dao.insertRate(rates)
     }
 
     fun stopUpdates() {
@@ -65,9 +86,9 @@ class MainActivityRepository {
 
         repeat(60) {
 
+            /* Two usages, forcefully stopping or waiting if the previous
+                request is still in business */
             if (shouldReceiveUpdates && requestStatus != RequestStatus.REQUESTING) {
-
-                Log.e("Rates Coroutine", it.toString() + " RequestStatus ${requestStatus.name}")
 
                 getExchangesRates()
 
