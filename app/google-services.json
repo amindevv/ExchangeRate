@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "790569294981",
+    "firebase_url": "https://echangecenter.firebaseio.com",
+    "project_id": "echangecenter",
+    "storage_bucket": "echangecenter.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:790569294981:android:7cad6f16078eeff1cb1dec",
+        "android_client_info": {
+          "package_name": "dev.amin.echangecenter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "790569294981-ronk3u9m3dhbc4q10hrlu5ssknk8mdkc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "dev.amin.echangecenter",
+            "certificate_hash": "645f94be4cc18aacfcb26ac9c92e9f413dc9d820"
+          }
+        },
+        {
+          "client_id": "790569294981-j9f4is8e8vel864a52egkjo3n9gnn1ai.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCzpr6PZqcyRBsThaonsJjfDTq5ihplECU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "790569294981-j9f4is8e8vel864a52egkjo3n9gnn1ai.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
