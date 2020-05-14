@@ -3,6 +3,8 @@ package dev.amin.echangecenter.core
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import dev.amin.echangecenter.data.models.RateEntry
+import dev.amin.echangecenter.data.models.Rates
 import java.util.*
 
 class DBTypeConverters {
@@ -17,16 +19,17 @@ class DBTypeConverters {
         return value?.time
     }
 
-    @TypeConverter // Jsonify the maps
-    fun stringToRatesMap(value: String): HashMap<String, Double> {
+    @TypeConverter // Jsonify the RateEntry List
+    fun stringToRatesList(value: String): List<RateEntry> {
 
-        val type = object : TypeToken<HashMap<String, Double>>() {}.type
+        val type = object : TypeToken<List<RateEntry>>() {}.type
 
         return Gson().fromJson(value, type)
     }
 
-    @TypeConverter // UnJsonify the maps
-    fun toString(value: HashMap<String, Double>): String {
-        return Gson().toJson(value)
+    @TypeConverter // UnJsonify the RateEntryList
+    fun ratesListToString(list: List<RateEntry>): String {
+
+        return Gson().toJson(list)
     }
 }

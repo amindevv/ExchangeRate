@@ -5,7 +5,7 @@ import androidx.room.*
 import dev.amin.echangecenter.data.dao.RatesDao
 import dev.amin.echangecenter.data.models.Rates
 
-@Database(entities = [Rates::class], version = 1)
+@Database(entities = [Rates::class], version = 2)
 @TypeConverters(DBTypeConverters::class)
 abstract class AppDb : RoomDatabase() {
 

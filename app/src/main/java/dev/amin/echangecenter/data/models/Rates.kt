@@ -11,10 +11,6 @@ class Rates(
     val id: Int = 0,
     var dateCreated: Date = Date(),
 
-    /* This is just a UI feature, may
-        someone prefers to hide some pairs */
-    val isVisible: Boolean = true,
-
     val baseCurrency: String = "",
-    val rates: HashMap<String, Double> = hashMapOf()
+    val rates: List<RateEntry> = listOf()
 )

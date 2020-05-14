@@ -3,6 +3,13 @@ package dev.amin.echangecenter.core
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
+import dev.amin.echangecenter.data.models.Rates
+import retrofit2.Converter
+import java.lang.reflect.Type
+
 
 object RetrofitClient {
 
@@ -17,9 +24,23 @@ object RetrofitClient {
     private val retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
         .client(client)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
 
     val exchangeInterface =
-        retrofit.create(RatesNetworkInterface::class.java)
+        retrofit
+            .addConverterFactory(
+                createGsonConverter(
+                    Rates::class.java,
+                    RateGsonConverter()
+                )
+            )
+            .build()
+            .create(RatesNetworkInterface::class.java)
+
+    private fun createGsonConverter(type: Type, typeAdapter: Any): Converter.Factory {
+
+        val gson =
+            GsonBuilder().registerTypeAdapter(type, typeAdapter).create()
+
+        return GsonConverterFactory.create(gson)
+    }
 }

@@ -14,7 +14,7 @@ import java.util.*
 
 class MainActivityRepository(context: Context) {
 
-    var baseCurrency = "EUR"
+    private val db = AppDb.invoke(context)
 
     private var shouldReceiveUpdates = false
 
@@ -22,7 +22,10 @@ class MainActivityRepository(context: Context) {
         make the next request or not */
     private var requestStatus = RequestStatus.NONE
 
-    private val db = AppDb.invoke(context)
+    // Reference to the database, VM uses this
+    val rates = db.ratesDao().getLiveRates()
+
+    var baseCurrency = "EUR"
 
     private fun getExchangesRates() = runBlocking(Dispatchers.Default) {
 
