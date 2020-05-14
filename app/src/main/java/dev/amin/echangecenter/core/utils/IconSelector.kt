@@ -4,6 +4,13 @@ import dev.amin.echangecenter.R
 
 object IconSelector {
 
+    /***
+     *
+     * We have icons thanks to this repo :)
+     *
+     * https://github.com/transferwise/currency-flags
+     */
+    
     private val icons = hashMapOf(
         "AUD" to R.drawable.ic_aud, "BGN" to R.drawable.ic_bgn,
         "BRL" to R.drawable.ic_brl, "CAD" to R.drawable.ic_cad,

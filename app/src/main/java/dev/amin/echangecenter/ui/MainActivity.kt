@@ -5,15 +5,21 @@ import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import dev.amin.echangecenter.R
+import dev.amin.echangecenter.data.models.Rates
 import dev.amin.echangecenter.data.repositories.MainActivityRepository
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
+    private val exchangeAdapter = ExchangeAdapter()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        init()
 
         val repo = MainActivityRepository(this)
 
@@ -25,13 +31,22 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.getExchangeRates()
 
-        viewModel.rates.observe(this, Observer {rates ->
+        viewModel.rates.observe(this, Observer { rates ->
 
-            rates
+            updateAdapter(rates)
         })
+    }
 
-        btn.setOnClickListener {
-            viewModel.stopUpdates()
+    private fun updateAdapter(rates: Rates?) {
+        exchangeAdapter.updateDataSet(rates ?: return)
+    }
+
+    private fun init() {
+
+        rvExchange.apply {
+            layoutManager = LinearLayoutManager(this@MainActivity)
+            adapter = exchangeAdapter
         }
     }
+
 }
