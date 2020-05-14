@@ -1,15 +1,15 @@
-package dev.amin.echangecenter
+package dev.amin.echangecenter.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import dev.amin.echangecenter.data.repositories.MainActivityRepository
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-
 
 
 class MainActivityViewModel(
     private val repo: MainActivityRepository
 ) : ViewModel() {
+
+    val rates = repo.rates
 
     fun getExchangeRates(baseCurrency: String = repo.baseCurrency) {
 
@@ -24,7 +24,7 @@ class MainActivityViewModel(
 
     class Factory(private val repo: MainActivityRepository) : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            return  MainActivityViewModel(repo) as T
+            return MainActivityViewModel(repo) as T
         }
     }
 }
