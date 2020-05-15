@@ -22,39 +22,23 @@
 
             <ImageView
                 android:id="@+id/ivFlag"
-                android:layout_width="100dp"
+                android:layout_width="80dp"
                 android:layout_height="100dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <View
-                android:layout_width="100dp"
+                android:layout_width="80dp"
                 android:layout_height="100dp"
                 android:background="@color/colorTint"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etAmount"
-                android:layout_width="0dp"
-                android:layout_height="50dp"
-                android:layout_marginStart="24dp"
-                android:layout_marginTop="12dp"
-                android:layout_marginEnd="100dp"
-                android:hint="Amount"
-                android:padding="4dp"
-                android:textColor="@color/colorPrimaryText"
-                android:textColorHint="@color/colorHintText"
-                android:textSize="22dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/ivFlag"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/tvCurrency"
-                android:layout_width="100dp"
+                android:layout_width="80dp"
                 android:layout_height="100dp"
                 android:gravity="center"
                 android:textColor="@color/colorPrimaryText"
@@ -64,16 +48,108 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="AUD" />
 
+            <!-- Data Container, Shows the Rates and Exchanged Rates -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/dataContainer"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/tvCurrency"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/tvRateTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Rate"
+                    android:textColor="@color/colorSecondaryText"
+                    app:layout_constraintStart_toStartOf="@id/tvRate"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tvRate"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_marginStart="12dp"
+                    android:gravity="center_vertical"
+                    android:lines="1"
+                    android:maxLines="1"
+                    android:textColor="@color/colorPrimaryText"
+                    android:textSize="24dp"
+                    app:layout_constraintEnd_toStartOf="@id/tvExchangedRate"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvRateTitle" />
+
+                <TextView
+                    android:id="@+id/tvExchangedRateTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Exchanged Rate"
+                    android:textColor="@color/colorSecondaryText"
+                    app:layout_constraintStart_toStartOf="@id/tvExchangedRate"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tvExchangedRate"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="24dp"
+                    android:gravity="center_vertical"
+                    android:lines="1"
+                    android:maxLines="1"
+                    android:textColor="@color/colorPrimaryText"
+                    android:textSize="24dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/tvRate"
+                    app:layout_constraintTop_toBottomOf="@id/tvRateTitle" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Input Container, Get the user input when the currency is selected as -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/inputContainer"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/tvCurrency"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <EditText
+                    android:id="@+id/etAmount"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="24dp"
+                    android:enabled="false"
+                    android:hint="Amount, 100"
+                    android:textColor="@color/colorPrimaryText"
+                    android:textColorHint="@color/colorHintText"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.35" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- The little thing down the row which shows the currency's full name -->
             <TextView
                 android:id="@+id/tvCurrencyComplete"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="4dp"
+                android:layout_marginStart="12dp"
+                android:layout_marginBottom="12dp"
                 android:text="Australian Dollar"
-                android:textColor="@color/colorSecondaryText"
+                android:textColor="@color/colorHintText"
                 android:textSize="14dp"
-                app:layout_constraintStart_toStartOf="@id/etAmount"
-                app:layout_constraintTop_toBottomOf="@id/etAmount" />
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/tvCurrency" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

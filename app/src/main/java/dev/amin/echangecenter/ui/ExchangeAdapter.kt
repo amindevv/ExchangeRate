@@ -10,24 +10,28 @@ import dev.amin.echangecenter.core.utils.IconSelector
 import dev.amin.echangecenter.data.models.RateEntry
 import dev.amin.echangecenter.data.models.Rates
 import kotlinx.android.synthetic.main.row_rate.view.*
+import java.text.NumberFormat
 
 
 class ExchangeAdapter(
     private val onClick: (rateEntry: RateEntry) -> Unit
 ) : RecyclerView.Adapter<ExchangeAdapter.ViewHolder>() {
 
+    companion object {
+        const val TYPE_HEADER = 0
+        const val TYPE_LOADING = 1
+        const val TYPE_DATA = 2
+    }
+
     /* This state is used for controlling the status of
         the loading */
     private var state = State.LOADING
 
-    private var baseCurrency: String = ""
     private var ratesList: MutableList<RateEntry> = mutableListOf()
 
     private var shouldUpdate = true
 
     fun updateDataSet(rates: Rates) {
-
-        baseCurrency = rates.baseCurrency
 
         if (!shouldUpdate) {
             shouldUpdate = true
@@ -46,7 +50,7 @@ class ExchangeAdapter(
 
         return when (viewType) {
 
-            0, 2 ->
+            TYPE_HEADER, TYPE_DATA ->
 
                 DataViewHolder(
                     LayoutInflater.from(parent.context).inflate(
@@ -78,12 +82,26 @@ class ExchangeAdapter(
 
     override fun getItemViewType(position: Int): Int {
 
-        return if (position == 0) {
-            2 // Header
+        /* If the item is a header but the data is still downloading,
+         I don't want to update the dataSet to have the view for input.
+         therefor I keep the viewType as Data and not Header. To achieve
+         the view I just call the animate function! */
+        return if (position == 0 && state != State.LOADING) {
+
+            // Header
+            TYPE_HEADER
+        } else if (position == 0) {
+
+            // This is the case in which we are still loading
+            TYPE_DATA
         } else if (state == State.LOADING) {
-            1 // Loading
+
+            // Loading
+            TYPE_LOADING
         } else {
-            2 // Data Holder
+
+            // Data Holder
+            TYPE_DATA
         }
     }
 
@@ -91,15 +109,18 @@ class ExchangeAdapter(
 
         when (getItemViewType(position)) {
 
-            0, 2 ->
-                if (holder is DataViewHolder) {
+            TYPE_HEADER ->
+                if (holder is DataViewHolder && ratesList.isNotEmpty())
+                    holder.setInput(ratesList[0])
+
+            TYPE_DATA ->
+                if (holder is DataViewHolder)
                     setData(holder, position)
-                }
 
             else ->
-                if (holder is LoadingViewHolder) {
+                if (holder is LoadingViewHolder)
                     holder.startLoadingAnimation()
-                }
+
         }
     }
 
@@ -113,10 +134,6 @@ class ExchangeAdapter(
         holder.setData(currentRateEntry)
 
         holder.itemView.setOnClickListener {
-
-            /* Change the state to loading so the adapter
-                will load out loading views */
-
 
             /* Tell the adapter to ignore the incoming updates,
                 This will make the adapter to skip one update. The
@@ -135,7 +152,11 @@ class ExchangeAdapter(
                 it != currentRateEntry
             }
 
+            /* Change the state to loading so the adapter
+                will load out loading views */
             state = State.LOADING
+
+            holder.animateToInput()
 
             /* Let the ViewModel know that we are requesting a
                 new currency */
@@ -143,6 +164,12 @@ class ExchangeAdapter(
         }
     }
 
+    /***
+     * Responsible for animating the selected item to the top of the list
+     * @param fromPosition It's current position
+     * @param toPosition Target position, default is 0 because we always
+     *  move to top
+     */
     private fun moveItem(fromPosition: Int, toPosition: Int = 0) {
         if (fromPosition == toPosition) return
 
@@ -161,6 +188,7 @@ class ExchangeAdapter(
 
         fun startLoadingAnimation() {
 
+            // TODO : load some animation here
         }
     }
 
@@ -170,17 +198,85 @@ class ExchangeAdapter(
 
             itemView.apply {
 
+                // Every android dev knows this pain
+                etAmount.clearFocus()
+                dataContainer.visibility = View.VISIBLE
+                dataContainer.alpha = 1f 
+                inputContainer.visibility = View.GONE
+                etAmount.isEnabled = false
+
+                // Normal data assignment
                 val currency = rate.currency
+                val exchangeRate = rate.exchangeRate
 
                 tvCurrency.text = currency
 
-                etAmount.setText(rate.exchangeRate.toString())
+                tvRate.text = exchangeRate.toString()
+
+                tvExchangedRate.text = getExchangedRate(exchangeRate)
+
+                inputContainer.alpha = 0f
 
                 Glide.with(this)
                     .load(IconSelector.getIcon(currency))
                     .centerCrop()
                     .into(ivFlag)
             }
+        }
+
+        /***
+         * Init the holder as Input, This case is used when the ViewModel is
+         * informed about the new Base Currency and has sent us the new data
+         */
+        fun setInput(rateEntry: RateEntry) {
+
+            val currency = rateEntry.currency
+
+            itemView.apply {
+
+                inputContainer.visibility = View.VISIBLE
+                dataContainer.visibility = View.GONE
+
+                tvCurrency.text = currency
+
+                Glide.with(this)
+                    .load(IconSelector.getIcon(currency))
+                    .centerCrop()
+                    .into(ivFlag)
+            }
+        }
+
+        /***
+         * This function is called when the new base is selected by the user, in order to
+         * keep the UI business clean, I didn't want to change the viewType so I just animated
+         * the views to get the same result!
+         */
+        fun animateToInput() {
+
+            itemView.apply {
+
+                setOnClickListener(null)
+
+                inputContainer.visibility = View.VISIBLE
+                inputContainer.animate().alpha(1f).setStartDelay(150).setDuration(250).start()
+
+                dataContainer.animate().alpha(0f).setStartDelay(150).setDuration(250)
+                    .withEndAction {
+
+                        etAmount.isEnabled = true
+
+                        dataContainer.visibility = View.GONE
+                    }
+            }
+        }
+
+        private fun getExchangedRate(exchangeRate: Double, amount: Double = 100.0): String {
+
+            val formatter = NumberFormat.getNumberInstance().apply {
+                maximumFractionDigits = 2
+            }
+
+            return formatter.format(exchangeRate * 100)
         }
     }
 
