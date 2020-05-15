@@ -10,7 +10,7 @@ object IconSelector {
      *
      * https://github.com/transferwise/currency-flags
      */
-    
+
     private val icons = hashMapOf(
         "AUD" to R.drawable.ic_aud, "BGN" to R.drawable.ic_bgn,
         "BRL" to R.drawable.ic_brl, "CAD" to R.drawable.ic_cad,
@@ -27,7 +27,7 @@ object IconSelector {
         "RON" to R.drawable.ic_ron, "RUB" to R.drawable.ic_rub,
         "SEK" to R.drawable.ic_sek, "THB" to R.drawable.ic_thb,
         "USD" to R.drawable.ic_usd, "ZAR" to R.drawable.ic_zar,
-        "SGD" to R.drawable.ic_sgd
+        "SGD" to R.drawable.ic_sgd, "EUR" to R.drawable.ic_eur
     )
 
     fun getIcon(currency: String): Int {

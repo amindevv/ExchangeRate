@@ -2,18 +2,22 @@ package dev.amin.echangecenter.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import dev.amin.echangecenter.R
+import dev.amin.echangecenter.data.models.RateEntry
 import dev.amin.echangecenter.data.models.Rates
 import dev.amin.echangecenter.data.repositories.MainActivityRepository
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
-    private val exchangeAdapter = ExchangeAdapter()
+    private val exchangeAdapter = ExchangeAdapter { rateEntry ->
+        onRateEntryClick(rateEntry)
+    }
+
+    private lateinit var viewModel: MainActivityViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,7 +27,7 @@ class MainActivity : AppCompatActivity() {
 
         val repo = MainActivityRepository(this)
 
-        val viewModel =
+        viewModel =
             ViewModelProvider(
                 this,
                 MainActivityViewModel.Factory(repo)
@@ -37,6 +41,16 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    private fun onRateEntryClick(rateEntry: RateEntry) {
+
+        if (::viewModel.isInitialized) {
+
+            rvExchange.scrollToPosition(0)
+
+            viewModel.getExchangeRates(rateEntry.currency)
+        }
+    }
+
     private fun updateAdapter(rates: Rates?) {
         exchangeAdapter.updateDataSet(rates ?: return)
     }
@@ -48,5 +62,4 @@ class MainActivity : AppCompatActivity() {
             adapter = exchangeAdapter
         }
     }
-
 }

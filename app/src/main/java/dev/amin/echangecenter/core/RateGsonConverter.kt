@@ -21,7 +21,7 @@ class RateGsonConverter : JsonDeserializer<Rates> {
 
         val baseCurrency = jsonObject?.get("baseCurrency")?.asString ?: ""
 
-        val exchangeRatesList = getRatesList(jsonObject)
+        val exchangeRatesList = getRatesList(jsonObject, baseCurrency)
 
         return Rates(
 
@@ -32,11 +32,18 @@ class RateGsonConverter : JsonDeserializer<Rates> {
         )
     }
 
-    private fun getRatesList(jsonObject: JsonObject?): List<RateEntry> {
+    private fun getRatesList(jsonObject: JsonObject?, baseCurrency: String): List<RateEntry> {
 
         val rateEntries = mutableListOf<RateEntry>()
 
         val exchangeRatesMap = jsonObject?.get("rates")?.asJsonObject ?: return emptyList()
+
+        rateEntries.add(
+            RateEntry(
+                currency = baseCurrency,
+                exchangeRate = 100.0
+            )
+        )
 
         exchangeRatesMap.keySet().forEach { currency ->
 

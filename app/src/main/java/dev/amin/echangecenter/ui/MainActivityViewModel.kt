@@ -1,7 +1,10 @@
 package dev.amin.echangecenter.ui
 
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import dev.amin.echangecenter.data.models.Rates
 import dev.amin.echangecenter.data.repositories.MainActivityRepository
 
 
@@ -9,17 +12,44 @@ class MainActivityViewModel(
     private val repo: MainActivityRepository
 ) : ViewModel() {
 
-    val rates = repo.rates
+    private val repoRates = repo.rates
+
+    private val repoRatesObserver = Observer<Rates> {
+
+
+        // I filter the data here then post it for the view
+
+        /*
+
+            val currentBaseOldPos = 1
+            val
+
+         */
+
+        rates.postValue(it)
+    }
+
+    val rates = MutableLiveData<Rates>()
+
+    init {
+
+        // Looking for updates from Repo
+        repoRates.observeForever(repoRatesObserver)
+    }
 
     fun getExchangeRates(baseCurrency: String = repo.baseCurrency) {
 
         repo.baseCurrency = baseCurrency
-        repo.startUpdates()
     }
 
     fun stopUpdates() {
 
         repo.stopUpdates()
+    }
+
+    override fun onCleared() {
+        rates.removeObserver(repoRatesObserver)
+        super.onCleared()
     }
 
     class Factory(private val repo: MainActivityRepository) : ViewModelProvider.Factory {
