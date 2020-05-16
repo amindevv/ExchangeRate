@@ -3,6 +3,7 @@ package dev.amin.echangecenter.ui
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import dev.amin.echangecenter.R
@@ -21,6 +22,12 @@ class ExchangeAdapter(
         const val TYPE_HEADER = 0
         const val TYPE_LOADING = 1
         const val TYPE_DATA = 2
+    }
+
+    private var amount: Int = 100
+
+    private val onAmountChanged: (amount: Int) -> Unit = { amount ->
+        this.amount = amount
     }
 
     /* This state is used for controlling the status of
@@ -111,7 +118,7 @@ class ExchangeAdapter(
 
             TYPE_HEADER ->
                 if (holder is DataViewHolder && ratesList.isNotEmpty())
-                    holder.setInput(ratesList[0])
+                    holder.setInput(ratesList[0], onAmountChanged)
 
             TYPE_DATA ->
                 if (holder is DataViewHolder)
@@ -131,7 +138,7 @@ class ExchangeAdapter(
 
         val currentRateEntry = ratesList[position]
 
-        holder.setData(currentRateEntry)
+        holder.setData(currentRateEntry, amount)
 
         holder.itemView.setOnClickListener {
 
@@ -194,16 +201,17 @@ class ExchangeAdapter(
 
     class DataViewHolder(itemView: View) : ViewHolder(itemView) {
 
-        fun setData(rate: RateEntry) {
+        fun setData(rate: RateEntry, amount: Int) {
 
             itemView.apply {
 
                 // Every android dev knows this pain
                 etAmount.clearFocus()
                 dataContainer.visibility = View.VISIBLE
-                dataContainer.alpha = 1f 
+                dataContainer.alpha = 1f
                 inputContainer.visibility = View.GONE
                 etAmount.isEnabled = false
+
 
                 // Normal data assignment
                 val currency = rate.currency
@@ -213,7 +221,7 @@ class ExchangeAdapter(
 
                 tvRate.text = exchangeRate.toString()
 
-                tvExchangedRate.text = getExchangedRate(exchangeRate)
+                tvExchangedRate.text = getExchangedRate(exchangeRate, amount)
 
                 inputContainer.alpha = 0f
 
@@ -228,7 +236,7 @@ class ExchangeAdapter(
          * Init the holder as Input, This case is used when the ViewModel is
          * informed about the new Base Currency and has sent us the new data
          */
-        fun setInput(rateEntry: RateEntry) {
+        fun setInput(rateEntry: RateEntry, amount: (amount: Int) -> Unit) {
 
             val currency = rateEntry.currency
 
@@ -236,6 +244,20 @@ class ExchangeAdapter(
 
                 inputContainer.visibility = View.VISIBLE
                 dataContainer.visibility = View.GONE
+
+                // Ime options is for the return key.
+                etAmount.isEnabled = true
+                etAmount.imeOptions = EditorInfo.IME_ACTION_DONE
+                etAmount.setOnEditorActionListener { textView, i, keyEvent ->
+
+                    if (i == EditorInfo.IME_ACTION_DONE) {
+
+                        amount(Integer.valueOf(etAmount.text.toString()))
+                        true
+                    }
+
+                    false
+                }
 
                 tvCurrency.text = currency
 
@@ -270,13 +292,13 @@ class ExchangeAdapter(
             }
         }
 
-        private fun getExchangedRate(exchangeRate: Double, amount: Double = 100.0): String {
+        private fun getExchangedRate(exchangeRate: Double, amount: Int = 100): String {
 
             val formatter = NumberFormat.getNumberInstance().apply {
                 maximumFractionDigits = 2
             }
 
-            return formatter.format(exchangeRate * 100)
+            return formatter.format(exchangeRate * amount)
         }
     }
 
