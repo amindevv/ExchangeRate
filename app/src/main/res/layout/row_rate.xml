@@ -144,7 +144,7 @@
 
             <!-- The little thing down the row which shows the currency's full name -->
             <TextView
-                android:id="@+id/tvCurrencyComplete"
+                android:id="@+id/tvCurrencyName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"

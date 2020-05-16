@@ -7,7 +7,7 @@ import android.view.inputmethod.EditorInfo
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import dev.amin.echangecenter.R
-import dev.amin.echangecenter.core.utils.IconSelector
+import dev.amin.echangecenter.core.utils.CurrencyHelper
 import dev.amin.echangecenter.data.models.RateEntry
 import dev.amin.echangecenter.data.models.Rates
 import kotlinx.android.synthetic.main.row_rate.view.*
@@ -163,7 +163,7 @@ class ExchangeAdapter(
                 will load out loading views */
             state = State.LOADING
 
-            holder.animateToInput()
+            holder.animateToInput(amount)
 
             /* Let the ViewModel know that we are requesting a
                 new currency */
@@ -201,7 +201,7 @@ class ExchangeAdapter(
 
     class DataViewHolder(itemView: View) : ViewHolder(itemView) {
 
-        fun setData(rate: RateEntry, amount: Int) {
+        fun setData(rateEntry: RateEntry, amount: Int) {
 
             itemView.apply {
 
@@ -212,23 +212,20 @@ class ExchangeAdapter(
                 inputContainer.visibility = View.GONE
                 etAmount.isEnabled = false
 
-
                 // Normal data assignment
-                val currency = rate.currency
-                val exchangeRate = rate.exchangeRate
+                val currency = rateEntry.currency
+                val exchangeRate = rateEntry.exchangeRate
 
                 tvCurrency.text = currency
-
+                tvCurrencyName.text = CurrencyHelper.getCurrencyInfo(rateEntry.currency).first
                 tvRate.text = exchangeRate.toString()
-
                 tvExchangedRate.text = getExchangedRate(exchangeRate, amount)
-
-                inputContainer.alpha = 0f
-
                 Glide.with(this)
-                    .load(IconSelector.getIcon(currency))
+                    .load(CurrencyHelper.getIcon(currency))
                     .centerCrop()
                     .into(ivFlag)
+
+                inputContainer.alpha = 0f
             }
         }
 
@@ -237,8 +234,6 @@ class ExchangeAdapter(
          * informed about the new Base Currency and has sent us the new data
          */
         fun setInput(rateEntry: RateEntry, amount: (amount: Int) -> Unit) {
-
-            val currency = rateEntry.currency
 
             itemView.apply {
 
@@ -259,10 +254,12 @@ class ExchangeAdapter(
                     false
                 }
 
-                tvCurrency.text = currency
+                val currency = rateEntry.currency
 
+                tvCurrency.text = currency
+                tvCurrencyName.text = CurrencyHelper.getCurrencyInfo(rateEntry.currency).first
                 Glide.with(this)
-                    .load(IconSelector.getIcon(currency))
+                    .load(CurrencyHelper.getIcon(currency))
                     .centerCrop()
                     .into(ivFlag)
             }
@@ -273,7 +270,7 @@ class ExchangeAdapter(
          * keep the UI business clean, I didn't want to change the viewType so I just animated
          * the views to get the same result!
          */
-        fun animateToInput() {
+        fun animateToInput(amount: Int) {
 
             itemView.apply {
 
@@ -281,6 +278,8 @@ class ExchangeAdapter(
 
                 inputContainer.visibility = View.VISIBLE
                 inputContainer.animate().alpha(1f).setStartDelay(150).setDuration(250).start()
+
+                etAmount.setText(amount.toString())
 
                 dataContainer.animate().alpha(0f).setStartDelay(150).setDuration(250)
                     .withEndAction {

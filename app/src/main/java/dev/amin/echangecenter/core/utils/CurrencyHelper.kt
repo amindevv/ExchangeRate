@@ -1,8 +1,29 @@
 package dev.amin.echangecenter.core.utils
 
 import dev.amin.echangecenter.R
+import java.util.*
+import kotlin.Comparator
 
-object IconSelector {
+
+object CurrencyHelper {
+
+    // [CurrencyCode] = (CurrencyName, CurrencySymbol)
+    private val currencies = hashMapOf<String, Pair<String, String>>()
+
+    init {
+
+        val locales = Locale.getAvailableLocales()
+
+        locales.forEach {
+
+            try {
+                val currency = Currency.getInstance(it)
+                currencies[currency.currencyCode] = Pair(currency.displayName, currency.symbol)
+            } catch (e: Exception) {
+                // Just pass it's ok
+            }
+        }
+    }
 
     /***
      *
@@ -10,7 +31,6 @@ object IconSelector {
      *
      * https://github.com/transferwise/currency-flags
      */
-
     private val icons = hashMapOf(
         "AUD" to R.drawable.ic_aud, "BGN" to R.drawable.ic_bgn,
         "BRL" to R.drawable.ic_brl, "CAD" to R.drawable.ic_cad,
@@ -30,7 +50,11 @@ object IconSelector {
         "SGD" to R.drawable.ic_sgd, "EUR" to R.drawable.ic_eur
     )
 
-    fun getIcon(currency: String): Int {
-        return icons[currency] ?: -1
+    fun getIcon(currencyCode: String): Int {
+        return icons[currencyCode] ?: -1
+    }
+
+    fun getCurrencyInfo(currencyCode: String): Pair<String, String> {
+        return currencies[currencyCode] ?: Pair("", "")
     }
 }
