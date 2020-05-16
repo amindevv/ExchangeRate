@@ -2,7 +2,6 @@ package dev.amin.echangecenter.core.utils
 
 import dev.amin.echangecenter.R
 import java.util.*
-import kotlin.Comparator
 
 
 object CurrencyHelper {
@@ -12,6 +11,9 @@ object CurrencyHelper {
 
     init {
 
+        /* First I get all the locales then I try to get a currency from them,
+            Some of the locales are not associated with a currency. I could also filter
+            the array and search on a dictionary but I believe this is faster */
         val locales = Locale.getAvailableLocales()
 
         locales.forEach {
@@ -54,6 +56,10 @@ object CurrencyHelper {
         return icons[currencyCode] ?: -1
     }
 
+    /***
+     * @param currencyCode e.g EUR
+     * @return Pair<String, String> (CurrencyName, CurrencySymbol)
+     */
     fun getCurrencyInfo(currencyCode: String): Pair<String, String> {
         return currencies[currencyCode] ?: Pair("", "")
     }

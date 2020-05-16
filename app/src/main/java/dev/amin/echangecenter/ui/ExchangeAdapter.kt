@@ -19,13 +19,18 @@ class ExchangeAdapter(
 ) : RecyclerView.Adapter<ExchangeAdapter.ViewHolder>() {
 
     companion object {
+        // Header is where I keep the BaseCurrency
         const val TYPE_HEADER = 0
+        // When we are loading new rates based on a new currency
         const val TYPE_LOADING = 1
+        // Rates
         const val TYPE_DATA = 2
     }
 
+    // The amount which has to be converted
     private var amount: Int = 100
 
+    // Callback from user
     private val onAmountChanged: (amount: Int) -> Unit = { amount ->
         this.amount = amount
     }
@@ -34,17 +39,21 @@ class ExchangeAdapter(
         the loading */
     private var state = State.LOADING
 
+    // Dear data set
     private var ratesList: MutableList<RateEntry> = mutableListOf()
 
     private var shouldUpdate = true
 
     fun updateDataSet(rates: Rates) {
 
+        /* This will cause the adapter to skip one update,
+            so the next update will be with the new base. */
         if (!shouldUpdate) {
             shouldUpdate = true
             return
         }
 
+        // Stop the loading
         state = State.SHOW
 
         ratesList.clear()
@@ -131,6 +140,9 @@ class ExchangeAdapter(
         }
     }
 
+    /***
+     * Sets the Currency Info on the DataViewHolder
+     */
     private fun setData(holder: DataViewHolder, position: Int) {
 
         if (ratesList.isEmpty())
@@ -207,10 +219,11 @@ class ExchangeAdapter(
 
                 // Every android dev knows this pain
                 etAmount.clearFocus()
-                dataContainer.visibility = View.VISIBLE
-                dataContainer.alpha = 1f
-                inputContainer.visibility = View.GONE
                 etAmount.isEnabled = false
+                dataContainer.visibility = View.VISIBLE
+                inputContainer.visibility = View.GONE
+                dataContainer.alpha = 1f
+                inputContainer.alpha = 0f
 
                 // Normal data assignment
                 val currency = rateEntry.currency
@@ -224,8 +237,6 @@ class ExchangeAdapter(
                     .load(CurrencyHelper.getIcon(currency))
                     .centerCrop()
                     .into(ivFlag)
-
-                inputContainer.alpha = 0f
             }
         }
 

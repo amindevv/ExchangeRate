@@ -97,9 +97,10 @@ class MainActivityRepository(context: Context) {
                 if (shouldReceiveUpdates && requestStatus != RequestStatus.REQUESTING) {
 
                     getExchangesRates()
-
-                    delay(1000)
                 }
+
+                // Outside ifs, We need the delay despite the request status
+                delay(1000)
             }
         }
     }

@@ -33,8 +33,6 @@ class MainActivity : AppCompatActivity() {
                 MainActivityViewModel.Factory(repo)
             ).get(MainActivityViewModel::class.java)
 
-        viewModel.getExchangeRates()
-
         viewModel.rates.observe(this, Observer { rates ->
 
             updateAdapter(rates)
