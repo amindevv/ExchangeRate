@@ -41,6 +41,18 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    override fun onPause() {
+        super.onPause()
+
+        viewModel.stopUpdates()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        viewModel.startUpdates()
+    }
+
     private fun onRateEntryClick(rateEntry: RateEntry) {
 
         if (::viewModel.isInitialized) {

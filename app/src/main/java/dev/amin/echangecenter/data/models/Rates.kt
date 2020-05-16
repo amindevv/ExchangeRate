@@ -9,7 +9,7 @@ class Rates(
 
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    var dateCreated: Date = Date(),
+    var dateCreated: Date = Date(System.currentTimeMillis()),
 
     val baseCurrency: String = "",
     val rates: List<RateEntry> = listOf()

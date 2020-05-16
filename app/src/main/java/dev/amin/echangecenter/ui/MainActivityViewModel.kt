@@ -16,15 +16,9 @@ class MainActivityViewModel(
 
     private val repoRatesObserver = Observer<Rates> {
 
-
-        // I filter the data here then post it for the view
-
-        /*
-
-            val currentBaseOldPos = 1
-            val
-
-         */
+        /* This is to prevent direct recyclerView access to the data
+            If there is any logical modification to the data it should
+            be done here */
 
         rates.postValue(it)
     }
@@ -42,12 +36,18 @@ class MainActivityViewModel(
         repo.baseCurrency = baseCurrency
     }
 
+    fun startUpdates() {
+
+        repo.startUpdates()
+    }
+
     fun stopUpdates() {
 
         repo.stopUpdates()
     }
 
     override fun onCleared() {
+        stopUpdates()
         rates.removeObserver(repoRatesObserver)
         super.onCleared()
     }

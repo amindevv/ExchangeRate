@@ -14,38 +14,27 @@ import java.util.*
 
 class MainActivityRepository(context: Context) {
 
+    // Response is feed to DB and from DB values are feed to ViewModel
     private val db = AppDb.invoke(context)
 
+    /*  This is the boss around here, responsible
+        for cancellations and continuations */
     private var shouldReceiveUpdates = false
 
     /* Request Status is used for handling if the repo should
         make the next request or not */
     private var requestStatus = RequestStatus.NONE
 
-    // Reference to the database, VM uses this
+    /* Reference to the database, VM uses this. ViewModel has no
+        idea about where the data comes from, he just takes it from db*/
     val rates = db.ratesDao().getLiveRates()
 
+    // BaseCurrency which is queried in to request
     var baseCurrency = "EUR"
 
-    private val exchangeRatesJob = GlobalScope.launch {
-
-        shouldReceiveUpdates = true
-
-        repeat(60) {
-
-            if (!shouldReceiveUpdates)
-                this.cancel()
-
-            /* Two usages, forcefully stopping or waiting if the previous
-                request is still in business */
-            if (shouldReceiveUpdates && requestStatus != RequestStatus.REQUESTING) {
-
-                getExchangesRates()
-
-                delay(1000)
-            }
-        }
-    }
+    /* This is the job which is repeated every one second
+        and calls the network request */
+    private var exchangeRatesJob: Job? = null
 
     private fun getExchangesRates() = runBlocking(Dispatchers.Default) {
 
@@ -85,19 +74,40 @@ class MainActivityRepository(context: Context) {
     /* Just simply saves the Rates in db */
     private fun saveRates(rates: Rates) = runBlocking(Dispatchers.IO) {
 
-        val dao = db.ratesDao()
+        db.ratesDao().insertRate(rates)
+    }
 
-        rates.apply {
-            dateCreated = Date(System.currentTimeMillis())
+    fun startUpdates() {
+
+        // Already running
+        if (shouldReceiveUpdates)
+            return
+
+        shouldReceiveUpdates = true
+
+        exchangeRatesJob = GlobalScope.launch {
+
+            repeat(1000) {
+
+                if (!shouldReceiveUpdates)
+                    this.cancel()
+
+                /* Two usages, forcefully stopping or waiting if the previous
+                request is still in business */
+                if (shouldReceiveUpdates && requestStatus != RequestStatus.REQUESTING) {
+
+                    getExchangesRates()
+
+                    delay(1000)
+                }
+            }
         }
-
-        dao.insertRate(rates)
     }
 
     fun stopUpdates() {
 
         shouldReceiveUpdates = false
 
-        exchangeRatesJob.cancel()
+        exchangeRatesJob?.cancel()
     }
 }
