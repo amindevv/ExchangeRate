@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import dev.amin.echangecenter.data.RequestStatus
 import dev.amin.echangecenter.data.models.Rates
 import dev.amin.echangecenter.data.repositories.MainActivityRepository
 import java.util.*
@@ -14,6 +15,8 @@ class MainActivityViewModel(
 ) : ViewModel() {
 
     private val repoRates = repo.rates
+
+    val requestStatus = repo.requestStatus
 
     private val repoRatesObserver = Observer<Rates> {
 

@@ -2,6 +2,7 @@ package dev.amin.echangecenter.data.repositories
 
 import android.content.Context
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import dev.amin.echangecenter.core.AppDb
 import dev.amin.echangecenter.core.RetrofitClient
 import dev.amin.echangecenter.data.RequestStatus
@@ -23,7 +24,7 @@ class MainActivityRepository(context: Context) {
 
     /* Request Status is used for handling if the repo should
         make the next request or not */
-    private var requestStatus = RequestStatus.NONE
+    var requestStatus = MutableLiveData<RequestStatus>()
 
     /* Reference to the database, VM uses this. ViewModel has no
         idea about where the data comes from, he just takes it from db*/
@@ -38,7 +39,7 @@ class MainActivityRepository(context: Context) {
 
     private fun getExchangesRates() = runBlocking(Dispatchers.Default) {
 
-        requestStatus = RequestStatus.REQUESTING
+        requestStatus.postValue(RequestStatus.REQUESTING)
 
         val call = RetrofitClient.exchangeInterface.getLatest(baseCurrency)
 
@@ -46,7 +47,7 @@ class MainActivityRepository(context: Context) {
 
             override fun onFailure(call: Call<Rates>, t: Throwable) {
 
-                requestStatus = RequestStatus.FAILURE
+                requestStatus.postValue(RequestStatus.FAILURE)
             }
 
             override fun onResponse(
@@ -58,14 +59,12 @@ class MainActivityRepository(context: Context) {
 
                 if (ratesResponse != null) {
 
-                    requestStatus = RequestStatus.SUCCESS
+                    requestStatus.postValue(RequestStatus.SUCCESS)
 
                     saveRates(ratesResponse)
-
-                    Log.e("Rates Received", ratesResponse.baseCurrency)
                 } else {
 
-                    requestStatus = RequestStatus.FAILURE
+                    requestStatus.postValue(RequestStatus.FAILURE)
                 }
             }
         })
@@ -108,6 +107,8 @@ class MainActivityRepository(context: Context) {
     fun stopUpdates() {
 
         shouldReceiveUpdates = false
+
+        requestStatus.postValue(RequestStatus.NONE)
 
         exchangeRatesJob?.cancel()
     }

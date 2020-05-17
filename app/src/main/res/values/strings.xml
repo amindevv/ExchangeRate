@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">EchangeCenter</string>
+    <string name="message_status_disconnected">Disconnected</string>
+    <string name="message_staus_retrying">Connection Problem, Retrying!</string>
+    <string name="message_status_success">Connected, Receiving Data!</string>
 </resources>

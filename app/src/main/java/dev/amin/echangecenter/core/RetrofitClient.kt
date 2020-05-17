@@ -9,6 +9,7 @@ import com.google.gson.reflect.TypeToken
 import dev.amin.echangecenter.data.models.Rates
 import retrofit2.Converter
 import java.lang.reflect.Type
+import java.util.concurrent.TimeUnit
 
 
 object RetrofitClient {
@@ -19,6 +20,7 @@ object RetrofitClient {
         use the header */
     private val client = OkHttpClient.Builder()
         .cache(null)
+        .callTimeout(2, TimeUnit.SECONDS)
         .build()
 
     private val retrofit = Retrofit.Builder()
