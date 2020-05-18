@@ -1,9 +1,12 @@
 package dev.amin.echangecenter.ui
 
+import android.animation.ValueAnimator
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import androidx.core.text.isDigitsOnly
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import dev.amin.echangecenter.R
@@ -26,6 +29,10 @@ class ExchangeAdapter(
         // Rates
         const val TYPE_DATA = 2
     }
+
+    var baseColor = Color.BLACK
+    var validColor = Color.BLACK
+    var invalidColor = Color.BLUE
 
     // The amount which has to be converted
     private var amount: Int = 100
@@ -73,7 +80,10 @@ class ExchangeAdapter(
                         R.layout.row_rate,
                         parent,
                         false
-                    )
+                    ),
+                    baseColor,
+                    validColor,
+                    invalidColor
                 )
             else ->
 
@@ -211,7 +221,12 @@ class ExchangeAdapter(
         }
     }
 
-    class DataViewHolder(itemView: View) : ViewHolder(itemView) {
+    class DataViewHolder(
+        itemView: View,
+        private val baseColor: Int,
+        private val validColor: Int,
+        private val invalidColor: Int
+    ) : ViewHolder(itemView) {
 
         fun setData(rateEntry: RateEntry, amount: Int) {
 
@@ -237,6 +252,8 @@ class ExchangeAdapter(
                     .load(CurrencyHelper.getIcon(currency))
                     .centerCrop()
                     .into(ivFlag)
+
+                container.setCardBackgroundColor(baseColor)
             }
         }
 
@@ -251,6 +268,11 @@ class ExchangeAdapter(
                 inputContainer.visibility = View.VISIBLE
                 dataContainer.visibility = View.GONE
 
+                if (validateInput(etAmount.text.toString()))
+                    container.setCardBackgroundColor(validColor)
+                else
+                    container.setCardBackgroundColor(invalidColor)
+
                 // Ime options is for the return key.
                 etAmount.isEnabled = true
                 etAmount.imeOptions = EditorInfo.IME_ACTION_DONE
@@ -258,7 +280,16 @@ class ExchangeAdapter(
 
                     if (i == EditorInfo.IME_ACTION_DONE) {
 
-                        amount(Integer.valueOf(etAmount.text.toString()))
+                        val text = etAmount.text.toString()
+
+                        // Send the value to the upper hands after validation
+
+                        if (validateInput(text)) {
+                            animateColorToValid()
+                            amount(Integer.valueOf(text))
+                        } else
+                            animateColorToInvalid()
+
                         true
                     }
 
@@ -299,6 +330,57 @@ class ExchangeAdapter(
 
                         dataContainer.visibility = View.GONE
                     }
+
+                animateColorToValid()
+            }
+        }
+
+        private fun validateInput(text: String): Boolean {
+
+            return (text.isDigitsOnly() && text.length < 8)|| text.isEmpty()
+        }
+
+        private fun animateColorToValid() {
+
+            itemView.container.apply {
+
+                val cardColor = cardBackgroundColor.defaultColor
+
+                if (cardColor == validColor)
+                    return
+
+                ValueAnimator.ofArgb(cardColor, validColor).apply {
+
+                    duration = 900
+                    start()
+
+                    addUpdateListener {
+
+                        setCardBackgroundColor(it.animatedValue as Int)
+                    }
+                }
+            }
+        }
+
+        private fun animateColorToInvalid() {
+
+            itemView.container.apply {
+
+                val cardColor = cardBackgroundColor.defaultColor
+
+                if (cardColor == invalidColor)
+                    return
+
+                ValueAnimator.ofArgb(cardBackgroundColor.defaultColor, invalidColor).apply {
+
+                    duration = 500
+                    start()
+
+                    addUpdateListener {
+
+                        setCardBackgroundColor(it.animatedValue as Int)
+                    }
+                }
             }
         }
 

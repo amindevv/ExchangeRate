@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -82,6 +83,12 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(toolbarContainer.toolbar)
 
+        exchangeAdapter.apply {
+            baseColor = ContextCompat.getColor(this@MainActivity, R.color.colorSurface)
+            validColor = ContextCompat.getColor(this@MainActivity, R.color.colorGreen)
+            invalidColor = ContextCompat.getColor(this@MainActivity, R.color.colorRed)
+        }
+
         rvExchange.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = exchangeAdapter
@@ -101,7 +108,11 @@ class MainActivity : AppCompatActivity() {
             if (this.isAnimating)
                 return
 
-            Toast.makeText(this@MainActivity, getString(R.string.message_status_success), Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                this@MainActivity,
+                getString(R.string.message_status_success),
+                Toast.LENGTH_LONG
+            ).show()
 
             visibility = View.VISIBLE
 
@@ -124,7 +135,11 @@ class MainActivity : AppCompatActivity() {
             if (this.isAnimating)
                 return
 
-            Toast.makeText(this@MainActivity, getString(R.string.message_staus_retrying), Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                this@MainActivity,
+                getString(R.string.message_staus_retrying),
+                Toast.LENGTH_LONG
+            ).show()
 
             visibility = View.VISIBLE
 
@@ -134,7 +149,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updatesStopped() {
-        
-        Toast.makeText(this@MainActivity, getString(R.string.message_status_disconnected), Toast.LENGTH_LONG).show()
+
+        Toast.makeText(
+            this@MainActivity,
+            getString(R.string.message_status_disconnected),
+            Toast.LENGTH_LONG
+        ).show()
     }
 }

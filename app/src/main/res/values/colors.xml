@@ -9,6 +9,9 @@
 
     <color name="colorTint">#8A000000</color>
 
+    <color name="colorGreen">#447C46</color>
+    <color name="colorRed">#A03936</color>
+
     <color name="colorPrimaryText">#f2f2f2</color>
     <color name="colorSecondaryText">#BFF2F2F2</color>
     <color name="colorHintText">#80F2F2F2</color>
